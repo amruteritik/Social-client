@@ -8,6 +8,9 @@ import PostsWidget from "scenes/widgets/PostsWidget";
 import UserWidget from "scenes/widgets/UserWidget";
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import {useTheme} from "@mui/material";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -15,12 +18,14 @@ const ProfilePage = () => {
   const { palette } = useTheme();
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
-
+  const [open, setOpen] = useState(false);
   const getUser = async () => {
+    setOpen(true);
     const response = await fetch(`https://social-server-cu09.onrender.com/users/${userId}`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
+    setOpen(false);
     const data = await response.json();
     setUser(data);
   };
@@ -46,6 +51,7 @@ const ProfilePage = () => {
   if (!user) return null;
 
   return (
+    <>
     <Box>
       <Navbar />
       <Box
@@ -82,6 +88,13 @@ const ProfilePage = () => {
       }} />
       </IconButton>}
     </Box>
+    <Backdrop
+          sx={{ color: "blue", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={open}
+      >
+          <CircularProgress color="inherit" />
+    </Backdrop>
+    </>
   );
 };
 

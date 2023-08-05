@@ -13,6 +13,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TwitterIcon from '@mui/icons-material/Twitter';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+
 
 const UserWidget = ({ userId, picturePath }) => {
   const [user, setUser] = useState(null);
@@ -22,12 +25,16 @@ const UserWidget = ({ userId, picturePath }) => {
   const dark = palette.neutral.dark;
   const medium = palette.neutral.medium;
   const main = palette.neutral.main;
+  const [open, setOpen] = useState(false);
+
 
   const getUser = async () => {
+    setOpen(true);
     const response = await fetch(`https://social-server-cu09.onrender.com/users/${userId}`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
+    setOpen(false);
     const data = await response.json();
     setUser(data);
   };
@@ -52,6 +59,7 @@ const UserWidget = ({ userId, picturePath }) => {
   } = user;
 
   return (
+    <>
     <WidgetWrapper>
       {/* FIRST ROW */}
       <FlexBetween
@@ -155,6 +163,13 @@ const UserWidget = ({ userId, picturePath }) => {
         </FlexBetween>
       </Box>
     </WidgetWrapper>
+    <Backdrop
+          sx={{ color: "white", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={open}
+      >
+          <CircularProgress color="inherit" />
+    </Backdrop>
+    </>
   );
 };
 

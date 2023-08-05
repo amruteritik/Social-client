@@ -15,6 +15,8 @@ import { useDispatch } from "react-redux";
 import { setLogin } from "state";
 import Dropzone from "react-dropzone";
 import FlexBetween from "components/FlexBetween";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const registerSchema = yup.object().shape({
   firstName: yup.string().required("required"),
@@ -56,6 +58,7 @@ const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
+  const [open, setOpen] = useState(false);
 
   const register = async (values, onSubmitProps) => {
     // this allows us to send form info with image
@@ -81,11 +84,16 @@ const Form = () => {
   };
 
   const login = async (values, onSubmitProps) => {
-    const loggedInResponse = await fetch("https://social-server-cu09.onrender.com/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    });
+    setOpen(true);
+    const loggedInResponse = await fetch(
+      "https://social-server-cu09.onrender.com/auth/login",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      }
+    );
+    setOpen(false);
     const loggedIn = await loggedInResponse.json();
     onSubmitProps.resetForm();
     if (loggedIn) {
@@ -105,6 +113,7 @@ const Form = () => {
   };
 
   return (
+    <>
     <Formik
       onSubmit={handleFormSubmit}
       initialValues={isLogin ? initialValuesLogin : initialValuesRegister}
@@ -281,6 +290,13 @@ const Form = () => {
         </form>
       )}
     </Formik>
+    <Backdrop
+          sx={{ color: "blue", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={open}
+      >
+          <CircularProgress color="inherit" />
+    </Backdrop>
+    </>
   );
 };
 
